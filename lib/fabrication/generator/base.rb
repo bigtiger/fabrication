@@ -40,7 +40,16 @@ class Fabrication::Generator::Base
     else
       value = block_given? ? yield(instance) : param
     end
-    instance.send("#{method_name.to_s}=", value)
+    if instance.respond_to?("#{method_name.to_s}=")
+      instance.send("#{method_name.to_s}=", value)
+    else
+      instance.instance_variable_set("@__#{method_name}__", value)
+      instance.instance_eval %Q{
+        def #{method_name}
+          @__#{method_name}__
+        end
+      }
+    end
   end
 
   def process_attributes(options, &block)

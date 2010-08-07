@@ -9,6 +9,9 @@ class Fabrication::Generator::ActiveRecord < Fabrication::Generator::Base
     if block_given?
       count = (args && args.first && args.first[:count]) || 0
       unless (args.first && args.first[:force]) || instance.class.columns.map(&:name).include?(method_name)
+        unless instance.respond_to? method_name
+          raise Fabrication::UnknownAttributeError.new("You defined '#{method_name}' for a #{instance.class.to_s} but it isn't defined on the original class.  define with - field_name(:force => true)")
+        end
         # copy the original getter
         instance.instance_variable_set("@__#{method_name}_original", instance.method(method_name).clone)
 

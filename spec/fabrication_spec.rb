@@ -128,6 +128,37 @@ describe Fabrication do
 
   end
 
+ context 'stubbing methods' do
+   before(:all) do 
+     Fabricator(:company) do 
+       unknown_attribute(:force => true){"Awesome value"}
+       another_unknown "Another Awesome Val"
+       unknown_block(:force => true){Fabricate(:division)}
+     end 
+
+     Fabricator(:division) do
+       name "Awesome division"
+     end      
+   end
+
+   before { TestMigration.up }
+   after { TestMigration.down }
+
+   let(:company) { Fabricate(:company) }
+   
+   it "stubs methods when args in attr" do 
+     company.unknown_attribute.should == "Awesome value"
+   end
+
+   it "stubs methods with value" do 
+     company.another_unknown.should == "Another Awesome Val"
+   end
+
+   it "stubs methods with block" do
+     company.unknown_block.name.should == "Awesome division"
+   end
+ end
+
   context 'with an active record object' do
 
     before(:all) do
