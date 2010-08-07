@@ -64,7 +64,7 @@ module Fabrication
 
         if File.directory? path
           Dir[File.join(path, '*.rb')].each do |file|
-            require file
+            require File.expand_path file
           end
         end
       end
